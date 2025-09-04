@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'freelance.project'
+version = '0.0.1-SNAPSHOT'
+description = 'BANK_SYSTEM'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Postgres
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // JPA validation
+    implementation 'jakarta.validation:jakarta.validation-api'
+    implementation 'org.hibernate.validator:hibernate-validator'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    // testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // ModelMapper
+    implementation 'org.modelmapper:modelmapper:3.2.4'
+    implementation 'org.modelmapper.extensions:modelmapper-jackson:3.2.4'
+
+    // Tests
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.18.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.12.2'
+
+//    // SOAP (Spring Web Services + JAX-WS)
+//    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+//    implementation 'jakarta.xml.ws:jakarta.xml.ws-api:4.0.0'
+//    implementation 'com.sun.xml.ws:jaxws-rt:4.0.1' // реализация JAX-WS
+//
+    // gRPC
+    implementation 'io.grpc:grpc-netty-shaded:1.64.0'
+    implementation 'io.grpc:grpc-protobuf:1.64.0'
+    implementation 'io.grpc:grpc-stub:1.64.0'
+
+    implementation 'com.google.protobuf:protobuf-java:3.25.3'
+    implementation 'com.google.protobuf:protobuf-java-util:3.25.3'
+//
+//    // Liquibase
+//    implementation 'org.liquibase:liquibase-core'
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
