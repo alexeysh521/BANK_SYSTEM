@@ -13,7 +13,9 @@ import java.util.UUID;
 public class Account {
 
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue(generator = "UUID")
+    @Column(updatable = false, nullable = false)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

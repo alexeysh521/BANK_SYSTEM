@@ -2,6 +2,7 @@ package freelance.project.bank_system.service;
 
 import freelance.project.bank_system.dto.LoginResponseDto;
 import freelance.project.bank_system.dto.RegisterResponseDto;
+import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -75,9 +77,14 @@ public class AuthService {
         user.setPassword(encoder.encode(password));
 
         User savedUser = userRepository.save(user);
-        Account account = accountService.createDefAccount(savedUser);
 
-        savedUser.setAccounts(List.of(account));
+        Account account = new Account(
+                BigDecimal.ZERO,
+                CurrencyType.RUB,
+                savedUser
+        );
+
+        savedUser.getAccounts().add(account);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtService.generatedToken(userDetails);
@@ -86,7 +93,7 @@ public class AuthService {
 
         return new RegisterResponseDto(
                 token,
-                user.getId(),
+                savedUser.getId(),
                 username,
                 Instant.now()
         );

@@ -2,6 +2,7 @@ package freelance.project.bank_system.service;
 
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.RolesType;
+import freelance.project.bank_system.enums.UserStatusType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
@@ -29,6 +30,10 @@ public class UserService {
         User user = userRepository.findUserById(dto.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setStatus(dto.status());
+
+        if(dto.status() == UserStatusType.BLOCKED)
+            user.setRole(RolesType.BANNED.name());
+
         userRepository.save(user);
 
         return new ReplaceStatusUserResponse(
@@ -59,7 +64,7 @@ public class UserService {
         User user = userRepository.findUserById(dto.user_id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        Account account = accountRepository.findAllByUser(user)
+        Account account = accountRepository.findByUser(user)
                 .stream()
                 .filter(acc -> acc.getId().equals(dto.acc_id()))
                 .findFirst()

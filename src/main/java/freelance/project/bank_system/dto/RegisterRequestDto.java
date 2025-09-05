@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record RegisterRequestDto(
     @NotNull(message = "The field must not be empty")
-    @Pattern(regexp = "USER|ADMIN", message = "Role must be one of: USER, ADMIN")
+    @Pattern(regexp = "USER|ADMIN|MANAGER|BLOCKED", message = "Role must be one of: USER, ADMIN, MANAGER")
     String role,
 
     @NotNull(message = "The field must not be empty")

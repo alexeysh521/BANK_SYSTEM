@@ -33,7 +33,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserStatusType status = UserStatusType.LIMITED_ACCESS;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts = new ArrayList<>();
 
     @Column(name = "registration_date", nullable = false)

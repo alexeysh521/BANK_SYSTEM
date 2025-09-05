@@ -2,86 +2,96 @@ package freelance.project.bank_system.controller;
 
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.model.User;
+import freelance.project.bank_system.service.AccountService;
+import freelance.project.bank_system.service.ConsumerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+//✅ ❌
+
 @RestController
 @RequestMapping("/users")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 @RequiredArgsConstructor
 public class ConsumerController {
 
-    //создание нового аккаунта
+    private final ConsumerService consumerService;
+    private final AccountService accountService;
+
+    //создание нового аккаунта✅
     @PostMapping("/new/account")
-    public ResponseEntity<?> newAccount(@RequestBody @Valid NewAccountDto dto,
+    public ResponseEntity<?> newAccount(@RequestBody @Valid NewAccountRequest dto,
                                         @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(accountService.createAccount(dto, user));
     }
 
-    //просмотреть все свои аккаунты
+    //просмотреть все свои аккаунты✅
     @GetMapping("/view/all/my_accounts")
     public ResponseEntity<?> viewAllAccounts(@AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(accountService.findAllByUser(user));
     }
 
-    //проверка баланса
-    @GetMapping("/check/balance")
-    public ResponseEntity<?> checkBalance(@AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+    //проверка баланса✅
+    @PostMapping("/check/balance")
+    public ResponseEntity<?> checkBalance(@RequestBody @Valid CheckBalanceRequest dto,
+                                          @AuthenticationPrincipal User user){
+        return ResponseEntity.ok(consumerService.checkBalance(user, dto.account_id()));
     }
 
-    //посмотреть все транзакции на аккаунте
+    //посмотреть все транзакции на аккаунте                                                                              NOT REALIZED
     @PostMapping("/view/all_transactions/on_your_account")
     public ResponseEntity<?> viewAllTransactionsByAccount(@RequestBody @Valid ViewAllTranByAccDto dto,
             @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //пополнить баланс
+    //пополнить баланс                                                                                                   NOT REALIZED
     @PostMapping("/balance/operation/deposit")
     public ResponseEntity<?> deposit(@RequestBody @Valid DepositAccDto dto,
                                      @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //снять деньги
+    //снять деньги                                                                                                       NOT REALIZED
     @PostMapping("/balance/operation/withdraw")
     public ResponseEntity<?> withdraw(@RequestBody @Valid WithdrawAccDto dto,
                                       @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //перевести деньги
+    //перевести деньги                                                                                                   NOT REALIZED
     @PostMapping("/balance/operation/transfer")
     public ResponseEntity<?> transfer(@RequestBody @Valid TransferAccDto dto,
                                       @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //сменить логин
+    //сменить логин                                                                                                      NOT REALIZED
     @PatchMapping("/account/change/username")
     public ResponseEntity<?> changeUsername(@RequestBody @Valid ChangeUsernameDto dto,
                                             @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //сменить пароль
+    //сменить пароль                                                                                                     NOT REALIZED
     @PatchMapping("/account/change/password")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDto dto,
                                             @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //изменить данные
+    //изменить данные                                                                                                    NOT REALIZED
     @PatchMapping("/account/to_change/user_data")
     public ResponseEntity<?> toChangeUserData(@RequestBody @Valid ChangeUserDataDto dto,
                                               @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
-    //закрыть аккаунт
+    //закрыть аккаунт                                                                                                    NOT REALIZED
     @PostMapping("/account/closed")
     public ResponseEntity<?> closedAccount(@RequestBody @Valid ClosedAccountDto dto,
                                            @AuthenticationPrincipal User user){
