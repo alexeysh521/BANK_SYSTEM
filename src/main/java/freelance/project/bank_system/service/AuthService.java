@@ -1,7 +1,7 @@
 package freelance.project.bank_system.service;
 
-import freelance.project.bank_system.dto.LoginResponseDto;
-import freelance.project.bank_system.dto.RegisterResponseDto;
+import freelance.project.bank_system.dto.LoginResponse;
+import freelance.project.bank_system.dto.RegisterResponse;
 import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -37,7 +36,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
 
-    public LoginResponseDto login(String username, String password){
+    public LoginResponse login(String username, String password){
         try {
 
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
@@ -51,7 +50,7 @@ public class AuthService {
             Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
             String role = authorities.iterator().next().getAuthority().substring(5);
 
-            return new LoginResponseDto(
+            return new LoginResponse(
                     token,
                     role,
                     "Successful",
@@ -67,7 +66,7 @@ public class AuthService {
     }
 
     @Transactional
-    public RegisterResponseDto register(String username, String role, String password){
+    public RegisterResponse register(String username, String role, String password){
         if(existsUser(username))
             throw new IllegalArgumentException("Such a user already exists");
 
@@ -91,7 +90,7 @@ public class AuthService {
 
         log.info("Registered {} authorities: {}", username, role);
 
-        return new RegisterResponseDto(
+        return new RegisterResponse(
                 token,
                 savedUser.getId(),
                 username,

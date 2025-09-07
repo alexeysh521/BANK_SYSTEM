@@ -48,25 +48,25 @@ public class ConsumerController {
     @PostMapping("/view/all_transactions/my_account")
     public ResponseEntity<?> viewAllTransactionsByAccount(@RequestBody @Valid ViewAllTranByAccRequest dto,
             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(transactionService.viewAllTranByAcc(dto, user));
+        return ResponseEntity.ok(transactionService.viewAllTranByAcc(dto.account_id(), user.getId()));
     }
 
-    //пополнить баланс                                                                                                   NOT REALIZED
+    //пополнить баланс ✅
     @PostMapping("/balance/operation/deposit")
-    public ResponseEntity<?> deposit(@RequestBody @Valid DepositAccDto dto,
+    public ResponseEntity<?> deposit(@RequestBody @Valid DepOrWithAccRequest dto,
                                      @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(accountService.deposit(dto, user));
     }
 
-    //снять деньги                                                                                                       NOT REALIZED
+    //снять деньги ✅
     @PostMapping("/balance/operation/withdraw")
-    public ResponseEntity<?> withdraw(@RequestBody @Valid WithdrawAccDto dto,
+    public ResponseEntity<?> withdraw(@RequestBody @Valid DepOrWithAccRequest dto,
                                       @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(accountService.withdraw(dto, user));
     }
 
     //перевести деньги ✅
-    @PostMapping("/balance/operation/transfer")
+    @PostMapping("/operation/transfer")
     public ResponseEntity<?> transfer(@RequestBody @Valid TransferAccRequest dto,
                                       @AuthenticationPrincipal User user){
         return ResponseEntity.ok(transactionService.createTransaction(dto, user));
@@ -93,10 +93,10 @@ public class ConsumerController {
         return ResponseEntity.ok().build();
     }
 
-    //закрыть аккаунт                                                                                                    NOT REALIZED
-    @PostMapping("/account/closed")
-    public ResponseEntity<?> closedAccount(@RequestBody @Valid ClosedAccountDto dto,
+    //закрыть аккаунт ✅
+    @PostMapping("/close/your/account")
+    public ResponseEntity<?> closeAccount(@RequestBody @Valid ClosedAccRequest dto,
                                            @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(accountService.closeAccount(dto.account_id(), user.getId()));
     }
 }

@@ -1,9 +1,7 @@
 package freelance.project.bank_system.service;
 
-import freelance.project.bank_system.dto.CreateAccAnAdminRequest;
-import freelance.project.bank_system.dto.DataAccountResponse;
-import freelance.project.bank_system.dto.NewAccountRequest;
-import freelance.project.bank_system.dto.NewAccountResponse;
+import freelance.project.bank_system.dto.*;
+import freelance.project.bank_system.enums.AccountStatusType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
@@ -25,13 +23,55 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final ValidationService validationService;
 
-    //@Transactional сначана тест без аннотации
-    public Object findById(UUID id){
+    public DataAccountResponse findById(UUID id){
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Account not found"));
 
-        return convertTo(account);
+        return new DataAccountResponse(
+                account.getId(),
+                account.getUser().getId(),
+                account.getBalance(),
+                account.getCurrency(),
+                account.getStatus(),
+                account.getRegistrationDate()
+        );
+    }
+
+    @Transactional
+    public DepOrWithAccResponse deposit(DepOrWithAccRequest dto, User user){
+        Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
+
+        BigDecimal depositAmount = dto.currency().convert(dto.amount(), account.getCurrency());
+        account.setBalance(account.getBalance().add(depositAmount));
+
+        accountRepository.save(account);
+
+        return new DepOrWithAccResponse(
+                "successfully",
+                account.getBalance(),
+                account.getCurrency()
+        );
+    }
+
+    @Transactional
+    public DepOrWithAccResponse withdraw(DepOrWithAccRequest dto, User user){
+        Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
+
+        BigDecimal withAmount = dto.currency().convert(dto.amount(), account.getCurrency());
+
+        validationService.checkBalanceV(account.getBalance(), withAmount);
+
+        account.setBalance(account.getBalance().subtract(withAmount));
+
+        accountRepository.save(account);
+
+        return new DepOrWithAccResponse(
+                "successfully",
+                account.getBalance(),
+                account.getCurrency()
+        );
     }
 
     public List<UUID> findAllByUser(User user){
@@ -55,6 +95,20 @@ public class AccountService {
     }
 
     @Transactional
+    public ClosedAccResponse closeAccount(UUID account_id, UUID user_id){
+        Account account = validationService.executeAccount(account_id);
+        validationService.checkOwnerForAccount(account.getUser().getId(), user_id);
+
+        account.setStatus(AccountStatusType.CLOSED);
+
+        accountRepository.save(account);
+
+        return new ClosedAccResponse(
+                "successfully"
+        );
+    }
+
+    @Transactional
     public NewAccountResponse createAccount(NewAccountRequest dto, User userReq){
         User user = userRepository.findUserById(userReq.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -74,14 +128,10 @@ public class AccountService {
         );
     }
 
-    private DataAccountResponse convertTo(Account account){
-        return new DataAccountResponse(
-                account.getId(),
-                account.getUser().getId(),
-                account.getBalance(),
-                account.getCurrency(),
-                account.getStatus(),
-                account.getRegistrationDate()
-        );
+    private Account checkExecuteAndOwnerForAccount(UUID acc_id, UUID user_id){
+        Account account = validationService.executeAccount(acc_id);
+        validationService.checkOwnerForAccount(account.getUser().getId(), user_id);
+
+        return account;
     }
 }

@@ -15,4 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("SELECT t.id FROM Transaction t WHERE t.fromAccountId.id = :id")
     List<UUID> findAllByAccountId(@Param("id") UUID id);
 
+    @Query("SELECT t.id FROM Transaction t ORDER BY t.date DESC")
+    List<UUID> findAllTransactions();
+
 }

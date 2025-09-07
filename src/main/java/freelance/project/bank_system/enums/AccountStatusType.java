@@ -5,6 +5,7 @@ public enum AccountStatusType {
     ACTIVE,
     INACTIVE,
     BLOCKED,
+    CLOSED,
     PREMIUM,
     MINOR,
     PENDING_VERIFICATION;

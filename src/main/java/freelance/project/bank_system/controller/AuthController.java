@@ -1,8 +1,8 @@
 package freelance.project.bank_system.controller;
 
 
-import freelance.project.bank_system.dto.LoginRequestDto;
-import freelance.project.bank_system.dto.RegisterRequestDto;
+import freelance.project.bank_system.dto.LoginRequest;
+import freelance.project.bank_system.dto.RegisterRequest;
 import freelance.project.bank_system.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto dto){
+    public ResponseEntity<?> login(@RequestBody LoginRequest dto){
         return ResponseEntity.ok(authService.login(dto.username(), dto.password()));
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDto dto){
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest dto){
         return ResponseEntity.ok(authService.register(dto.username(), dto.role(), dto.password()));
     }
 
