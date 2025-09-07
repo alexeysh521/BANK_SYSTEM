@@ -31,6 +31,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setStatus(dto.status());
 
+        //сделать USER_BANNED или ADMIN_BANNED
         if(dto.status() == UserStatusType.BLOCKED)
             user.setRole(RolesType.BANNED.name());
 

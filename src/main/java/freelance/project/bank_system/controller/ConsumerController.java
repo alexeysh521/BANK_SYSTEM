@@ -4,6 +4,7 @@ import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.service.AccountService;
 import freelance.project.bank_system.service.ConsumerService;
+import freelance.project.bank_system.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-//✅ ❌
+//✅ ❌ @NotNull(message = "This field must not be empty")
 
 @RestController
 @RequestMapping("/users")
@@ -21,32 +22,33 @@ public class ConsumerController {
 
     private final ConsumerService consumerService;
     private final AccountService accountService;
+    private final TransactionService transactionService;
 
-    //создание нового аккаунта✅
+    //создание нового аккаунта ✅
     @PostMapping("/new/account")
     public ResponseEntity<?> newAccount(@RequestBody @Valid NewAccountRequest dto,
                                         @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.createAccount(dto, user));
     }
 
-    //просмотреть все свои аккаунты✅
+    //просмотреть все свои аккаунты ✅
     @GetMapping("/view/all/my_accounts")
     public ResponseEntity<?> viewAllAccounts(@AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.findAllByUser(user));
     }
 
-    //проверка баланса✅
+    //проверка баланса ✅
     @PostMapping("/check/balance")
     public ResponseEntity<?> checkBalance(@RequestBody @Valid CheckBalanceRequest dto,
                                           @AuthenticationPrincipal User user){
         return ResponseEntity.ok(consumerService.checkBalance(user, dto.account_id()));
     }
 
-    //посмотреть все транзакции на аккаунте                                                                              NOT REALIZED
-    @PostMapping("/view/all_transactions/on_your_account")
-    public ResponseEntity<?> viewAllTransactionsByAccount(@RequestBody @Valid ViewAllTranByAccDto dto,
+    //посмотреть все транзакции на аккаунте ✅
+    @PostMapping("/view/all_transactions/my_account")
+    public ResponseEntity<?> viewAllTransactionsByAccount(@RequestBody @Valid ViewAllTranByAccRequest dto,
             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(transactionService.viewAllTranByAcc(dto, user));
     }
 
     //пополнить баланс                                                                                                   NOT REALIZED
@@ -63,11 +65,11 @@ public class ConsumerController {
         return ResponseEntity.ok().build();
     }
 
-    //перевести деньги                                                                                                   NOT REALIZED
+    //перевести деньги ✅
     @PostMapping("/balance/operation/transfer")
-    public ResponseEntity<?> transfer(@RequestBody @Valid TransferAccDto dto,
+    public ResponseEntity<?> transfer(@RequestBody @Valid TransferAccRequest dto,
                                       @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(transactionService.createTransaction(dto, user));
     }
 
     //сменить логин                                                                                                      NOT REALIZED

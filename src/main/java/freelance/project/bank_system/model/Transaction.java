@@ -1,6 +1,8 @@
 package freelance.project.bank_system.model;
 
 import freelance.project.bank_system.enums.CurrencyType;
+import freelance.project.bank_system.enums.TransactionStatusType;
+import freelance.project.bank_system.enums.TransactionType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -12,27 +14,34 @@ import java.util.UUID;
 public class Transaction {
 
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue(generator = "UUID")
+    private UUID id;
 
     @ManyToOne
-    private Account from_account_id;
+    @JoinColumn(name = "from_account_id")
+    private Account fromAccountId;
 
     @ManyToOne
-    private Account to_account_id;
+    @JoinColumn(name = "to_account_id")
+    private Account toAccountId;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
-    private LocalDateTime date;
+    private LocalDateTime date = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status", nullable = false)
+    private TransactionStatusType transactionStatus = TransactionStatusType.PROCESSING;
+
     public Transaction(){}
 
-    public Transaction(Account to, Account from, BigDecimal amount, CurrencyType currency) {
-        this.to_account_id = to;
-        this.from_account_id = from;
+    public Transaction(Account from, Account to, BigDecimal amount, CurrencyType currency) {
+        this.toAccountId = to;
+        this.fromAccountId = from;
         this.amount = amount;
         this.currency = currency;
     }
@@ -45,20 +54,20 @@ public class Transaction {
         this.id = id;
     }
 
-    public Account getTo_account_id() {
-        return to_account_id;
+    public Account getToAccountId() {
+        return toAccountId;
     }
 
-    public void setTo_account_id(Account to_account_id) {
-        this.to_account_id = to_account_id;
+    public void setToAccountId(Account to_account_id) {
+        this.toAccountId = to_account_id;
     }
 
-    public Account getFrom_account_id() {
-        return from_account_id;
+    public Account getFromAccountId() {
+        return fromAccountId;
     }
 
-    public void setFrom_account_id(Account from_account_id) {
-        this.from_account_id = from_account_id;
+    public void setFromAccountId(Account from_account_id) {
+        this.fromAccountId = from_account_id;
     }
 
     public BigDecimal getAmount() {
@@ -83,5 +92,13 @@ public class Transaction {
 
     public void setCurrency(CurrencyType currency) {
         this.currency = currency;
+    }
+
+    public TransactionStatusType getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(TransactionStatusType transactionStatus) {
+        this.transactionStatus = transactionStatus;
     }
 }

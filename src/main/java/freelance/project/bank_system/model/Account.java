@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,7 +34,11 @@ public class Account {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate = LocalDateTime.now();
 
-    //добавить связь с транзакциями
+    @OneToMany(mappedBy = "toAccountId", cascade = CascadeType.ALL)
+    private List<Transaction> outgoingTransactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromAccountId", cascade = CascadeType.ALL)
+    private List<Transaction> incomingTransactions = new ArrayList<>();
 
     public Account() {}
 
@@ -88,5 +94,21 @@ public class Account {
 
     public void setStatus(AccountStatusType status) {
         this.status = status;
+    }
+
+    public List<Transaction> getOutgoingTransactions() {
+        return outgoingTransactions;
+    }
+
+    public void setOutgoingTransactions(List<Transaction> outgoingTransactions) {
+        this.outgoingTransactions = outgoingTransactions;
+    }
+
+    public List<Transaction> getIncomingTransactions() {
+        return incomingTransactions;
+    }
+
+    public void setIncomingTransactions(List<Transaction> incomingTransactions) {
+        this.incomingTransactions = incomingTransactions;
     }
 }

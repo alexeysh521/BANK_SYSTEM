@@ -1,6 +1,7 @@
 package freelance.project.bank_system.enums;
 
 public enum TransactionStatusType {
+
     SUCCESSFULLY,
     PROCESSING,
     UNSUCCESSFULLY;
