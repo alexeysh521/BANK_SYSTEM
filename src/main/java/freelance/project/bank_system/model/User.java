@@ -39,6 +39,10 @@ public class User implements UserDetails {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate = LocalDateTime.now();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "data_id")
+    private Data data;
+
     public User(){}
 
     @Override
@@ -122,5 +126,13 @@ public class User implements UserDetails {
 
     public void setStatus(UserStatusType status) {
         this.status = status;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
     }
 }

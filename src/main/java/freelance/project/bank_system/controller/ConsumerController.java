@@ -87,7 +87,7 @@ public class ConsumerController {
     }
 
     //изменить данные                                                                                                    NOT REALIZED
-    @PatchMapping("/account/to_change/user_data")
+    @PatchMapping("/account/change/user_data")
     public ResponseEntity<?> toChangeUserData(@RequestBody @Valid ChangeUserDataDto dto,
                                               @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();

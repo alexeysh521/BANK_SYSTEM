@@ -15,6 +15,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(generator = "UUID")
+    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne
