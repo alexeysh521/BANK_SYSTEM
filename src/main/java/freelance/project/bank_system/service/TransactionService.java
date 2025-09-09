@@ -2,6 +2,7 @@ package freelance.project.bank_system.service;
 
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.TransactionStatusType;
+import freelance.project.bank_system.enums.TransactionType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.Transaction;
 import freelance.project.bank_system.model.User;
@@ -29,7 +30,10 @@ public class TransactionService {
         Account fromAcc = validationService.executeAccount(dto.fromAccId());
         Account toAcc = validationService.executeAccount(dto.toAccId());
 
+        TransactionType typeTran = TransactionType.TRANSFER;
+
         validationService.checkOwnerForAccount(fromAcc.getUser().getId(), user.getId());
+        validationService.validateUserStatusForTransactionBegin(user.getStatus(), typeTran);
         BigDecimal amount = validationService.checkBalance(fromAcc.getBalance(), dto.amount());
 
         Transaction transaction = new Transaction(

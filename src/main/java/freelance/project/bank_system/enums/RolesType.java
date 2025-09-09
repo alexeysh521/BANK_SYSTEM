@@ -1,7 +1,10 @@
 package freelance.project.bank_system.enums;
 
 public enum RolesType {
-    USER, ADMIN, MANAGER, BANNED;
+    USER,
+    ADMIN,
+    MANAGER,
+    BANNED;
 
     public static RolesType getRoleType(String role){
         try{

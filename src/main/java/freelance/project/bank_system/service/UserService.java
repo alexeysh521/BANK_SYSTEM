@@ -4,13 +4,16 @@ import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.RolesType;
 import freelance.project.bank_system.enums.UserStatusType;
 import freelance.project.bank_system.model.Account;
+import freelance.project.bank_system.model.Data;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
+import freelance.project.bank_system.repository.DataRepository;
 import freelance.project.bank_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,15 +26,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final DataRepository dataRepository;
 
-    //ДОПОЛНЕНИЕ: если пользователь ввел дополнительные данные, его статус ACTIVE
     @Transactional
     public String replaceStatusUser(ReplaceUserStatusRequest dto){
         User user = userRepository.findUserById(dto.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setStatus(dto.status());
 
-        //сделать USER_BANNED или ADMIN_BANNED
         if(dto.status() == UserStatusType.BLOCKED)
             user.setRole(RolesType.BANNED.name());
 
@@ -79,6 +82,39 @@ public class UserService {
                 user id: %s,
                 account id: %s
                 """, dto.user_id(), dto.acc_id());
+    }
+
+    @Transactional
+    public String changeUsername(String newUsername, User user) {
+        user.setUsername(newUsername);
+        userRepository.save(user);
+
+        return "message: changed username successfully";
+    }
+
+    @Transactional
+    public String changePassword(String newPassword, User user) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "message: changed password successfully";
+    }
+
+    @Transactional
+    public String changeUserData(ChangeUserDataRequest dto, User user){
+        Data data = user.getData();
+
+        data.setFirstName(dto.firstName() != null ? dto.firstName() : data.getFirstName());
+        data.setAverageName(dto.averageName() != null ? dto.averageName() : data.getAverageName());
+        data.setLastName(dto.lastName() != null ? dto.lastName() : data.getLastName());
+        data.setEmail(dto.email() != null ? dto.email() : data.getEmail());
+        data.setPassportSeriesAndNumber(dto.passportSeriesAndNumber() != null ?
+                dto.passportSeriesAndNumber() : data.getPassportSeriesAndNumber());
+        data.setDateOfBirth(dto.dateOfBirth() != null ? dto.dateOfBirth() : data.getDateOfBirth());
+
+        dataRepository.save(data);
+
+        return "message: changed user data successfully";
     }
 
     public List<UUID> viewAllAccountsUser(UUID id){

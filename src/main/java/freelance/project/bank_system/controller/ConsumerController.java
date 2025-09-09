@@ -3,10 +3,7 @@ package freelance.project.bank_system.controller;
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.model.User;
-import freelance.project.bank_system.service.AccountService;
-import freelance.project.bank_system.service.ConsumerService;
-import freelance.project.bank_system.service.DataService;
-import freelance.project.bank_system.service.TransactionService;
+import freelance.project.bank_system.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-//✅ ❌ @NotNull(message = "This field must not be empty")
+//✅ ❌
 
 @RestController
 @RequestMapping("/users")
@@ -28,6 +25,7 @@ public class ConsumerController {
     private final AccountService accountService;
     private final TransactionService transactionService;
     private final DataService dataService;
+    private final UserService userService;
 
     //создание нового аккаунта ✅
     @PostMapping("/new/account/{currency}")
@@ -77,32 +75,32 @@ public class ConsumerController {
         return ResponseEntity.ok(transactionService.createTransaction(dto, user));
     }
 
-    //сменить логин                                                                                                      NOT REALIZED
-    @PatchMapping("/account/change/username")
-    public ResponseEntity<?> changeUsername(@RequestBody @Valid ChangeUsernameDto dto,
+    //сменить логин ✅
+    @PutMapping("/account/change/username")
+    public ResponseEntity<?> changeUsername(@RequestBody @Valid ChangeUsernameRequest dto,
                                             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.changeUsername(dto.newUsername(), user));
     }
 
-    //сменить пароль                                                                                                     NOT REALIZED
-    @PatchMapping("/account/change/password")
-    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDto dto,
+    //сменить пароль ✅
+    @PutMapping("/account/change/password")
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest dto,
                                             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.changePassword(dto.newPassword(), user));
     }
 
-    //добавить данные
+    //добавить данные ✅
     @PostMapping("/account/add/data")
     public ResponseEntity<?> addData(@RequestBody @Valid AddDataRequest dto,
                                      @AuthenticationPrincipal User user){
         return ResponseEntity.ok(dataService.create(dto, user));
     }
 
-    //изменить данные                                                                                                    NOT REALIZED
+    //изменить данные ✅
     @PatchMapping("/account/change/user/data")
-    public ResponseEntity<?> toChangeUserData(@RequestBody @Valid ChangeUserDataDto dto,
+    public ResponseEntity<?> changeUserData(@RequestBody @Valid ChangeUserDataRequest dto,
                                               @AuthenticationPrincipal User user){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(userService.changeUserData(dto, user));
     }
 
     //закрыть аккаунт ✅

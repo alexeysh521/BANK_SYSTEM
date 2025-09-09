@@ -3,6 +3,7 @@ package freelance.project.bank_system.service;
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.AccountStatusType;
 import freelance.project.bank_system.enums.CurrencyType;
+import freelance.project.bank_system.enums.TransactionType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
@@ -43,6 +44,7 @@ public class AccountService {
     @Transactional
     public DepOrWithAccResponse deposit(DepOrWithAccRequest dto, User user){
         Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
+        validationService.validateUserStatusForTransactionBegin(user.getStatus(), TransactionType.DEPOSIT);
 
         BigDecimal depositAmount = dto.currency().convert(dto.amount(), account.getCurrency());
         account.setBalance(account.getBalance().add(depositAmount));
@@ -59,11 +61,10 @@ public class AccountService {
     @Transactional
     public DepOrWithAccResponse withdraw(DepOrWithAccRequest dto, User user){
         Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
+        validationService.validateUserStatusForTransactionBegin(user.getStatus(), TransactionType.WITHDRAW);
 
         BigDecimal withAmount = dto.currency().convert(dto.amount(), account.getCurrency());
-
         validationService.checkBalanceV(account.getBalance(), withAmount);
-
         account.setBalance(account.getBalance().subtract(withAmount));
 
         accountRepository.save(account);
