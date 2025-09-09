@@ -6,6 +6,7 @@ import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.Transaction;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.TransactionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,20 @@ public class TransactionService {
                 "Successfully",
                 fromAcc.getBalance(),
                 fromAcc.getCurrency()
+        );
+    }
+
+    public TransactionInfoResponse viewAllById(UUID id){
+        Transaction t = transactionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
+
+        return new TransactionInfoResponse(
+                t.getFromAccountId().getId(),
+                t.getToAccountId().getId(),
+                t.getAmount(),
+                t.getDate(),
+                t.getCurrency(),
+                t.getTransactionStatus()
         );
     }
 

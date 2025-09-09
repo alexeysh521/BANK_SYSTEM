@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-//✅ ❌
+import java.util.UUID;
+
+//✅ ❌ @NotNull(message = "This field must not be empty")
 
 @RestController
 @RequiredArgsConstructor
@@ -53,25 +55,31 @@ public class AdminController {
     }
 
     //посмотреть данные пользователя ❌                                                                                  NOT REALIZED
-    @PostMapping("/view/data_user")
-    public ResponseEntity<?> viewDataUser(@RequestBody @Valid UUIDIdOperationRequest dto){
+    @PostMapping("/view/data/user/{id}")
+    public ResponseEntity<?> viewDataUser(@PathVariable UUID id){
         return ResponseEntity.ok().build();
     }
 
+    //посмотреть инфу транзакции ✅
+    @PostMapping("/view/data/transaction/by/{id}")
+    public ResponseEntity<?> viewDataTransaction(@PathVariable UUID id){
+        return ResponseEntity.ok(transactionService.viewAllById(id));
+    }
+
     //посмотреть данные аккаунта пользователя ✅
-    @PostMapping("/view/data_account")
-    public ResponseEntity<?> viewDataAccount(@RequestBody @Valid UUIDIdOperationRequest dto){
-        return ResponseEntity.ok(accountService.findById(dto.user_id()));
+    @PostMapping("/view/data/account/{id}")
+    public ResponseEntity<?> viewDataAccount(@PathVariable UUID id){
+        return ResponseEntity.ok(accountService.findById(id));
     }
 
     //посмотреть все аккаунты пользователя ✅
-    @PostMapping("/view/all_accounts_user")
-    public ResponseEntity<?> viewAllAccountsUser(@RequestBody @Valid UUIDIdOperationRequest dto){
-        return ResponseEntity.ok(userService.viewAllAccountsUser(dto.user_id()));
+    @PostMapping("/view/all/accounts/user/{id}")
+    public ResponseEntity<?> viewAllAccountsUser(@PathVariable UUID id){
+        return ResponseEntity.ok(userService.viewAllAccountsUser(id));
     }
 
     //создать новый аккаунт пользователю ✅
-    @PostMapping("/create/account/for_user")
+    @PostMapping("/create/account/for/user")
     public ResponseEntity<?> createAccount(@RequestBody @Valid CreateAccAnAdminRequest dto){
         return ResponseEntity.ok(accountService.creatingAnAccByAnAdmin(dto));
     }

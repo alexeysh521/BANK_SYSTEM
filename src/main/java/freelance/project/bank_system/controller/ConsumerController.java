@@ -4,6 +4,7 @@ import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.service.AccountService;
 import freelance.project.bank_system.service.ConsumerService;
+import freelance.project.bank_system.service.DataService;
 import freelance.project.bank_system.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 //✅ ❌ @NotNull(message = "This field must not be empty")
 
@@ -23,6 +26,7 @@ public class ConsumerController {
     private final ConsumerService consumerService;
     private final AccountService accountService;
     private final TransactionService transactionService;
+    private final DataService dataService;
 
     //создание нового аккаунта ✅
     @PostMapping("/new/account")
@@ -45,10 +49,10 @@ public class ConsumerController {
     }
 
     //посмотреть все транзакции на аккаунте ✅
-    @PostMapping("/view/all_transactions/my_account")
-    public ResponseEntity<?> viewAllTransactionsByAccount(@RequestBody @Valid ViewAllTranByAccRequest dto,
-            @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(transactionService.viewAllTranByAcc(dto.account_id(), user.getId()));
+    @PostMapping("/view/all/transactions/my/account/{account_id}")
+    public ResponseEntity<?> viewAllTransactionsByAccount(@PathVariable UUID account_id,
+                                                          @AuthenticationPrincipal User user){
+        return ResponseEntity.ok(transactionService.viewAllTranByAcc(account_id, user.getId()));
     }
 
     //пополнить баланс ✅
@@ -84,6 +88,13 @@ public class ConsumerController {
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDto dto,
                                             @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
+    }
+
+    //добавить данные
+    @PostMapping("/account/add/data")
+    public ResponseEntity<?> addData(@RequestBody @Valid AddDataRequest dto,
+                                     @AuthenticationPrincipal User user){
+        return ResponseEntity.ok(dataService.create(dto, user));
     }
 
     //изменить данные                                                                                                    NOT REALIZED
