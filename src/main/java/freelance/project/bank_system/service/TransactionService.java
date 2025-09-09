@@ -25,7 +25,7 @@ public class TransactionService {
     private final ValidationService validationService;
 
     @Transactional
-    public TransferAccResponse createTransaction(TransferAccRequest dto, User user){
+    public String createTransaction(TransferAccRequest dto, User user){
         Account fromAcc = validationService.executeAccount(dto.fromAccId());
         Account toAcc = validationService.executeAccount(dto.toAccId());
 
@@ -51,11 +51,11 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-        return new TransferAccResponse(
-                "Successfully",
-                fromAcc.getBalance(),
-                fromAcc.getCurrency()
-        );
+        return String.format("""
+                message: successfully,
+                balance: %.2f,
+                currency: %s
+                """, fromAcc.getBalance(), fromAcc.getCurrency());
     }
 
     public TransactionInfoResponse viewAllById(UUID id){
@@ -72,20 +72,14 @@ public class TransactionService {
         );
     }
 
-    public ViewAllTranByAccResponse viewAllTranByAcc(UUID account_id, UUID user_id) {
+    public List<UUID> viewAllTranByAcc(UUID account_id, UUID user_id) {
         Account account = validationService.executeAccount(account_id);
         validationService.checkOwnerForAccount(account.getUser().getId(), user_id);
 
-        List<UUID> transactionsId = transactionRepository.findAllByAccountId(account_id);
-
-        return new ViewAllTranByAccResponse(
-                transactionsId
-        );
+        return transactionRepository.findAllByAccountId(account_id);
     }
 
-    public ViewAllTranResponse viewAll(){
-        return new ViewAllTranResponse(
-                transactionRepository.findAllTransactions()
-        );
+    public List<UUID> viewAll(){
+        return transactionRepository.findAllTransactions();
     }
 }

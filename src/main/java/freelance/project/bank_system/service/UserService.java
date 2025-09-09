@@ -26,7 +26,7 @@ public class UserService {
 
     //ДОПОЛНЕНИЕ: если пользователь ввел дополнительные данные, его статус ACTIVE
     @Transactional
-    public ReplaceStatusUserResponse replaceStatusUser(ReplaceUserStatusRequest dto){
+    public String replaceStatusUser(ReplaceUserStatusRequest dto){
         User user = userRepository.findUserById(dto.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setStatus(dto.status());
@@ -37,31 +37,30 @@ public class UserService {
 
         userRepository.save(user);
 
-        return new ReplaceStatusUserResponse(
-                dto.id(),
-                dto.status(),
-                "Replace status User successfully"
-        );
+        return String.format("""
+                message: replace status User successfully
+                user id: %s,
+                user status: %s
+                """, dto.id(), dto.status());
     }
 
     @Transactional
-    public ReplaceRoleUserResponse replaceRoleUser(ReplaceRoleUserRequest dto){
+    public String replaceRoleUser(ReplaceRoleUserRequest dto){
         User user = userRepository.findUserById(dto.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.setRole(RolesType.fromString(dto.role()));
-
         userRepository.save(user);
 
-        return new ReplaceRoleUserResponse(
-                dto.id(),
-                dto.role(),
-                "Replace role User successfully"
-        );
+        return String.format("""
+                message: replace role User successfully
+                user id: %s,
+                user role: %s
+                """, dto.id(), dto.role());
     }
 
     @Transactional
-    public ReplaceAccUserResponse replaceAccStatus(ReplaceAccUserRequest dto) {
+    public String replaceAccStatus(ReplaceAccUserRequest dto) {
         User user = userRepository.findUserById(dto.user_id())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -75,11 +74,11 @@ public class UserService {
 
         accountRepository.save(account);
 
-        return new ReplaceAccUserResponse(
-                dto.user_id(),
-                dto.acc_id(),
-                "Replaced account status successfully"
-        );
+        return String.format("""
+                message: replaced account status successfully
+                user id: %s,
+                account id: %s
+                """, dto.user_id(), dto.acc_id());
     }
 
     public List<UUID> viewAllAccountsUser(UUID id){

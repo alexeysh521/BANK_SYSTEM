@@ -1,6 +1,7 @@
 package freelance.project.bank_system.controller;
 
 import freelance.project.bank_system.dto.*;
+import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.service.AccountService;
 import freelance.project.bank_system.service.ConsumerService;
@@ -29,23 +30,23 @@ public class ConsumerController {
     private final DataService dataService;
 
     //создание нового аккаунта ✅
-    @PostMapping("/new/account")
-    public ResponseEntity<?> newAccount(@RequestBody @Valid NewAccountRequest dto,
+    @PostMapping("/new/account/{currency}")
+    public ResponseEntity<?> newAccount(@PathVariable CurrencyType currency,
                                         @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(accountService.createAccount(dto, user));
+        return ResponseEntity.ok(accountService.createAccount(currency, user));
     }
 
     //просмотреть все свои аккаунты ✅
-    @GetMapping("/view/all/my_accounts")
+    @GetMapping("/view/all/my/accounts")
     public ResponseEntity<?> viewAllAccounts(@AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.findAllByUser(user));
     }
 
     //проверка баланса ✅
-    @PostMapping("/check/balance")
-    public ResponseEntity<?> checkBalance(@RequestBody @Valid CheckBalanceRequest dto,
+    @PostMapping("/check/balance/{account_id}")
+    public ResponseEntity<?> checkBalance(@PathVariable UUID account_id,
                                           @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(consumerService.checkBalance(user, dto.account_id()));
+        return ResponseEntity.ok(accountService.checkBalance(user, account_id));
     }
 
     //посмотреть все транзакции на аккаунте ✅
@@ -98,16 +99,16 @@ public class ConsumerController {
     }
 
     //изменить данные                                                                                                    NOT REALIZED
-    @PatchMapping("/account/change/user_data")
+    @PatchMapping("/account/change/user/data")
     public ResponseEntity<?> toChangeUserData(@RequestBody @Valid ChangeUserDataDto dto,
                                               @AuthenticationPrincipal User user){
         return ResponseEntity.ok().build();
     }
 
     //закрыть аккаунт ✅
-    @PostMapping("/close/your/account")
-    public ResponseEntity<?> closeAccount(@RequestBody @Valid ClosedAccRequest dto,
+    @PostMapping("/close/your/account/{account_id}")
+    public ResponseEntity<?> closeAccount(@PathVariable UUID account_id,
                                            @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(accountService.closeAccount(dto.account_id(), user.getId()));
+        return ResponseEntity.ok(accountService.closeAccount(account_id, user.getId()));
     }
 }

@@ -2,6 +2,7 @@ package freelance.project.bank_system.service;
 
 import freelance.project.bank_system.dto.*;
 import freelance.project.bank_system.enums.AccountStatusType;
+import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.model.Account;
 import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
@@ -94,38 +95,41 @@ public class AccountService {
         return accountRepository.save(account).getId();
     }
 
+    public String checkBalance(User user, UUID accountId){
+        Account account = validationService.executeAccount(accountId);
+        validationService.checkOwnerForAccount(account.getUser().getId(), user.getId());
+
+        return String.format("""
+                Balance: %.2f
+                Currency: %s
+                """, account.getBalance(), account.getCurrency());
+    }
+
     @Transactional
-    public ClosedAccResponse closeAccount(UUID account_id, UUID user_id){
+    public String closeAccount(UUID account_id, UUID user_id){
         Account account = validationService.executeAccount(account_id);
         validationService.checkOwnerForAccount(account.getUser().getId(), user_id);
 
         account.setStatus(AccountStatusType.CLOSED);
-
         accountRepository.save(account);
 
-        return new ClosedAccResponse(
-                "successfully"
-        );
+        return "Account closed successfully";
     }
 
     @Transactional
-    public NewAccountResponse createAccount(NewAccountRequest dto, User userReq){
+    public String createAccount(CurrencyType currency, User userReq){
         User user = userRepository.findUserById(userReq.getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Account account = new Account(
                 BigDecimal.ZERO,
-                dto.currency(),
+                currency,
                 user
         );
 
         accountRepository.save(account);
 
-        return new NewAccountResponse(
-                account.getId(),
-                user.getId(),
-                "Account created successfully"
-        );
+        return "Account created successfully";
     }
 
     private Account checkExecuteAndOwnerForAccount(UUID acc_id, UUID user_id){
