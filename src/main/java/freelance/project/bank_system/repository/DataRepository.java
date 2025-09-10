@@ -9,6 +9,4 @@ import java.util.UUID;
 @Repository
 public interface DataRepository extends JpaRepository<Data, UUID> {
 
-
-
 }

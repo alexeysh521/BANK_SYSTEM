@@ -1,6 +1,7 @@
 package freelance.project.bank_system.service;
 
 import freelance.project.bank_system.dto.*;
+import freelance.project.bank_system.enums.AccountStatusType;
 import freelance.project.bank_system.enums.RolesType;
 import freelance.project.bank_system.enums.UserStatusType;
 import freelance.project.bank_system.model.Account;
@@ -9,6 +10,7 @@ import freelance.project.bank_system.model.User;
 import freelance.project.bank_system.repository.AccountRepository;
 import freelance.project.bank_system.repository.DataRepository;
 import freelance.project.bank_system.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +33,11 @@ public class UserService {
 
     @Transactional
     public String replaceStatusUser(ReplaceUserStatusRequest dto){
-        User user = userRepository.findUserById(dto.id())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = findUserById(dto.id());
         user.setStatus(dto.status());
 
         if(dto.status() == UserStatusType.BLOCKED)
-            user.setRole(RolesType.BANNED.name());
+            user.setRole(RolesType.TEMPSUSPENSION.name());
 
         userRepository.save(user);
 
@@ -49,10 +50,12 @@ public class UserService {
 
     @Transactional
     public String replaceRoleUser(ReplaceRoleUserRequest dto){
-        User user = userRepository.findUserById(dto.id())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = findUserById(dto.id());
 
-        user.setRole(RolesType.fromString(dto.role()));
+        String dtoRole = RolesType.fromString(dto.role());
+        checkRoleAndStatusOnBlockedUser(dtoRole);
+
+        user.setRole(dtoRole);
         userRepository.save(user);
 
         return String.format("""
@@ -63,15 +66,25 @@ public class UserService {
     }
 
     @Transactional
-    public String replaceAccStatus(ReplaceAccUserRequest dto) {
-        User user = userRepository.findUserById(dto.user_id())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public String bannedUser(UUID id){
+        User user = findUserById(id);
+
+        user.setRole(RolesType.BANNED.name());
 
         Account account = accountRepository.findByUser(user)
-                .stream()
-                .filter(acc -> acc.getId().equals(dto.acc_id()))
-                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect User id OR Account id"));
+        account.setStatus(AccountStatusType.BLOCKED);
+        user.setStatus(UserStatusType.BLOCKED);
+
+        userRepository.save(user);
+
+        return "Successfully";
+    }
+
+    @Transactional
+    public String replaceAccStatus(ReplaceAccUserRequest dto) {
+        Account account = accountRepository.findById(dto.account_id())
+                        .orElseThrow(() -> new EntityNotFoundException("Account not found"));
 
         account.setStatus(dto.status());
 
@@ -79,9 +92,8 @@ public class UserService {
 
         return String.format("""
                 message: replaced account status successfully
-                user id: %s,
                 account id: %s
-                """, dto.user_id(), dto.acc_id());
+                """, dto.account_id());
     }
 
     @Transactional
@@ -120,6 +132,18 @@ public class UserService {
     public List<UUID> viewAllAccountsUser(UUID id){
         return userRepository.findAccountByUserId(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    private User findUserById(UUID id){
+        return userRepository.findUserById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    private void checkRoleAndStatusOnBlockedUser(String role){
+        if(role.equals(RolesType.BANNED.name()))
+            throw new IllegalArgumentException(
+                    "message: You can block the user in a special method at the URL: admin/banned/user/{id}"
+            );
     }
 
 }

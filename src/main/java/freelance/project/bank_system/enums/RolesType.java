@@ -4,6 +4,7 @@ public enum RolesType {
     USER,
     ADMIN,
     MANAGER,
+    TEMPSUSPENSION,
     BANNED;
 
     public static RolesType getRoleType(String role){

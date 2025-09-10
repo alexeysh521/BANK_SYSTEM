@@ -33,7 +33,7 @@ public class TransactionService {
         TransactionType typeTran = TransactionType.TRANSFER;
 
         validationService.checkOwnerForAccount(fromAcc.getUser().getId(), user.getId());
-        validationService.validateUserStatusForTransactionBegin(user.getStatus(), typeTran);
+        validationService.validateUserStatusForTransactionBegin(user.getStatus(), typeTran, fromAcc.getStatus());
         BigDecimal amount = validationService.checkBalance(fromAcc.getBalance(), dto.amount());
 
         Transaction transaction = new Transaction(

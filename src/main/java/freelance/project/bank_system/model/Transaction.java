@@ -2,7 +2,6 @@ package freelance.project.bank_system.model;
 
 import freelance.project.bank_system.enums.CurrencyType;
 import freelance.project.bank_system.enums.TransactionStatusType;
-import freelance.project.bank_system.enums.TransactionType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

@@ -32,7 +32,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationProvider authenticationProvider;
     private final UserDetailsService userDetailsService;
-    private final AccountService accountService;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
 

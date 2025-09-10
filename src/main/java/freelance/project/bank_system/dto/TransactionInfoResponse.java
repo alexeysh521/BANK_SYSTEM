@@ -14,5 +14,4 @@ public record TransactionInfoResponse(
         LocalDateTime creationDate,
         CurrencyType currency,
         TransactionStatusType transactionStatus
-
 ) {}

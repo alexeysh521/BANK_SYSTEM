@@ -44,7 +44,11 @@ public class AccountService {
     @Transactional
     public DepOrWithAccResponse deposit(DepOrWithAccRequest dto, User user){
         Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
-        validationService.validateUserStatusForTransactionBegin(user.getStatus(), TransactionType.DEPOSIT);
+        validationService.validateUserStatusForTransactionBegin(
+                user.getStatus(),
+                TransactionType.DEPOSIT,
+                account.getStatus()
+        );
 
         BigDecimal depositAmount = dto.currency().convert(dto.amount(), account.getCurrency());
         account.setBalance(account.getBalance().add(depositAmount));
@@ -61,7 +65,11 @@ public class AccountService {
     @Transactional
     public DepOrWithAccResponse withdraw(DepOrWithAccRequest dto, User user){
         Account account = checkExecuteAndOwnerForAccount(dto.account_id(), user.getId());
-        validationService.validateUserStatusForTransactionBegin(user.getStatus(), TransactionType.WITHDRAW);
+        validationService.validateUserStatusForTransactionBegin(
+                user.getStatus(),
+                TransactionType.WITHDRAW,
+                account.getStatus()
+        );
 
         BigDecimal withAmount = dto.currency().convert(dto.amount(), account.getCurrency());
         validationService.checkBalanceV(account.getBalance(), withAmount);

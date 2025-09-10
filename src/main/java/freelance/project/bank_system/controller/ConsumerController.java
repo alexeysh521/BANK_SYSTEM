@@ -13,98 +13,96 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-//✅ ❌
 
 @RestController
 @RequestMapping("/users")
-@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'MANAGER')")
 @RequiredArgsConstructor
 public class ConsumerController {
 
-    private final ConsumerService consumerService;
     private final AccountService accountService;
     private final TransactionService transactionService;
     private final DataService dataService;
     private final UserService userService;
 
-    //создание нового аккаунта ✅
+    //create new account
     @PostMapping("/new/account/{currency}")
     public ResponseEntity<?> newAccount(@PathVariable CurrencyType currency,
                                         @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.createAccount(currency, user));
     }
 
-    //просмотреть все свои аккаунты ✅
+    //view all my accounts
     @GetMapping("/view/all/my/accounts")
     public ResponseEntity<?> viewAllAccounts(@AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.findAllByUser(user));
     }
 
-    //проверка баланса ✅
-    @PostMapping("/check/balance/{account_id}")
+    //checking balance
+    @GetMapping("/check/balance/{account_id}")
     public ResponseEntity<?> checkBalance(@PathVariable UUID account_id,
                                           @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.checkBalance(user, account_id));
     }
 
-    //посмотреть все транзакции на аккаунте ✅
-    @PostMapping("/view/all/transactions/my/account/{account_id}")
+    //view all transaction on account
+    @GetMapping("/view/all/transactions/my/account/{account_id}")
     public ResponseEntity<?> viewAllTransactionsByAccount(@PathVariable UUID account_id,
                                                           @AuthenticationPrincipal User user){
         return ResponseEntity.ok(transactionService.viewAllTranByAcc(account_id, user.getId()));
     }
 
-    //пополнить баланс ✅
+    //deposit
     @PostMapping("/balance/operation/deposit")
     public ResponseEntity<?> deposit(@RequestBody @Valid DepOrWithAccRequest dto,
                                      @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.deposit(dto, user));
     }
 
-    //снять деньги ✅
+    //withdraw money
     @PostMapping("/balance/operation/withdraw")
     public ResponseEntity<?> withdraw(@RequestBody @Valid DepOrWithAccRequest dto,
                                       @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.withdraw(dto, user));
     }
 
-    //перевести деньги ✅
-    @PostMapping("/operation/transfer")
+    //transfer money
+    @PostMapping("/balance/operation/transfer")
     public ResponseEntity<?> transfer(@RequestBody @Valid TransferAccRequest dto,
                                       @AuthenticationPrincipal User user){
         return ResponseEntity.ok(transactionService.createTransaction(dto, user));
     }
 
-    //сменить логин ✅
-    @PutMapping("/account/change/username")
+    //change username
+    @PatchMapping("/account/change/username")
     public ResponseEntity<?> changeUsername(@RequestBody @Valid ChangeUsernameRequest dto,
                                             @AuthenticationPrincipal User user){
         return ResponseEntity.ok(userService.changeUsername(dto.newUsername(), user));
     }
 
-    //сменить пароль ✅
-    @PutMapping("/account/change/password")
+    //change password
+    @PatchMapping("/account/change/password")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest dto,
                                             @AuthenticationPrincipal User user){
         return ResponseEntity.ok(userService.changePassword(dto.newPassword(), user));
     }
 
-    //добавить данные ✅
+    //add data
     @PostMapping("/account/add/data")
     public ResponseEntity<?> addData(@RequestBody @Valid AddDataRequest dto,
                                      @AuthenticationPrincipal User user){
         return ResponseEntity.ok(dataService.create(dto, user));
     }
 
-    //изменить данные ✅
+    //change data
     @PatchMapping("/account/change/user/data")
     public ResponseEntity<?> changeUserData(@RequestBody @Valid ChangeUserDataRequest dto,
                                               @AuthenticationPrincipal User user){
         return ResponseEntity.ok(userService.changeUserData(dto, user));
     }
 
-    //закрыть аккаунт ✅
-    @PostMapping("/close/your/account/{account_id}")
+    //closed account
+    @PatchMapping("/close/your/account/{account_id}")
     public ResponseEntity<?> closeAccount(@PathVariable UUID account_id,
                                            @AuthenticationPrincipal User user){
         return ResponseEntity.ok(accountService.closeAccount(account_id, user.getId()));

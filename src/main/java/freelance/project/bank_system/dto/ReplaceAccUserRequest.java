@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record ReplaceAccUserRequest(
-        @NotNull(message = "This field must not be empty") UUID user_id,
-        @NotNull(message = "This field must not be empty") UUID acc_id,
+        @NotNull(message = "This field must not be empty") UUID account_id,
         @NotNull(message = "This field must not be empty") AccountStatusType status
 )
 {}

@@ -1,6 +1,7 @@
 package freelance.project.bank_system.filter;
 
 import freelance.project.bank_system.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,7 +60,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
 
-        } catch(Exception e){
+        } catch (ExpiredJwtException ex) {
+            HttpServletResponse responseEx = response;
+            responseEx.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            responseEx.setContentType("application/json");
+            responseEx.getWriter().write("{\"message\": \"Your session has expired. Please log in again.\"}");
+            return;
+        }
+        catch(Exception e){
             throw new ServletException(e);
         }
 
